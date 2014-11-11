@@ -82,3 +82,14 @@ form input[type=text] {
 .spinner img {
     padding: 10px;
 }
+
+.msg-text{
+    padding-left: 20px ;
+    color: lightslategray;
+}
+
+.msg-timestamp{
+    float: right;
+    padding-left: 20px ;
+    color: darkslategray;
+}
