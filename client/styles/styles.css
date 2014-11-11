@@ -90,6 +90,6 @@ form input[type=text] {
 
 .msg-timestamp{
     float: right;
-    padding-left: 20px ;
+    font-size: 10px;
     color: darkslategray;
 }

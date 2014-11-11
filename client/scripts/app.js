@@ -5,11 +5,11 @@
     initialize: function() {
       var that = this;
       // this.fetch({success:function() {
-      //     var mt = moment( that.get('createdAt') ).format('HH:mm MM/DD/YYYY')
-      //     that.set('msgtime', mt );
       //   }
       // });
 
+    var mt = moment( that.get('createdAt') ).format('HH:mm MM/DD/YYYY')
+    that.set('msgtime', mt );
 
     },
     defaults: {
@@ -40,7 +40,7 @@
     url: function() {
       return 'https://api.parse.com/1/classes/chatterbox?where={"roomname":"'+this.roomname+'"}';
     },
-    initialize: function(models,options) {
+    initialize: function(models, options) {
       this.roomname = options.roomname;
       this.fetch();
     },
@@ -54,25 +54,45 @@
   // =============== VIEW ==================
   var MessageView = Backbone.View.extend({
     tag: 'div',
-    className: 'messageView',
+    className: 'messageView ui floating message',
     initialize: function() {
       //setInterval( this.render.call(this), 1000 );
       this.listenTo(this.model, 'change', this.render );
     },
     render: function() {
-      var template = _.template($('#messageView').html());
+      var template = _.template($('#messageViewTemplate').html());
       this.$el.html(template(this.model.attributes));
       return this;
     }
 
+  });
 
+  var RoomView = Backbone.View.extend({
+    tag: 'div',
+    className: 'messageContainer',
+    initialize: function() {
+      var that = this;
+    },
+    render: function() {
+      var that = this;
 
+      this._messageViews = [];
+      this.collection.each(function(msg) {
+        that._messageViews.push(new MessageView({
+          model: msg
+        }));
+      });
+      $(this.el).empty(); // reset view
+
+      _(this._messageViews).each(function(mv){ // mv: message view
+        $(that.el).append(mv.render().el);
+      });
+    }
 
   });
 
 
-  var m1 = new Message();
-  var mv1 = new MessageView({model: new Message()});
+  var rv = new RoomView( {collection: new Room([],{roomname:'lobby'}) } );
 
 
 

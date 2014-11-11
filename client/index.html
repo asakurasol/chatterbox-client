@@ -18,13 +18,12 @@
     <div id="main">
       <h1 class="ui header">chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <div id="msgContainer">
-        <script type='text/template' id='messageView'>
-          <div class="ui floating message"><span><%= username %></span><span class="msg-text"><%= text %></span><span class="msg-timestamp"><%= msgtime %></span></div>
-
-
-
+        <script type='text/template' id='messageViewTemplate'>
+          <span><%= username %></span><span class="msg-text"><%= text %></span><span class="msg-timestamp"><%= msgtime %></span>
         </script>
+
+
+
       </div>
     </div>
   </body>
