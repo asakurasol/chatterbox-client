@@ -21,12 +21,12 @@
     <div id="main">
       <h1 class="ui header">chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <div class="ui left icon input">
-        <input type="text" placeholder="What are you thinking right now">
-        <i class="users icon"></i>
-        <button class="ui button">
-          Send
-        </button>
+      <div class="user-inputs">
+        <div class="ui left icon input">
+          <input id="msgToSend" type="text" placeholder="What are you thinking right now" size="50">
+          <i class="users icon"></i>
+        </div>
+        <button id="sendMsgBtn" class="ui button">Send</button>
       </div>
 
       <div id="main-msg"></div>

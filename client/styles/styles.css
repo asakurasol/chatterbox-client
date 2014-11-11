@@ -6,7 +6,7 @@ body {
 }
 
 #main {
-    width: 500px;
+    width: 50%;
     margin: auto;
     text-align: left;
     background: white;
@@ -92,4 +92,8 @@ form input[type=text] {
     float: right;
     font-size: 10px;
     color: darkslategray;
+}
+
+.user-inputs{
+    padding-bottom: 10px;
 }

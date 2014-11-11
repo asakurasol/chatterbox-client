@@ -1,7 +1,11 @@
-// [TODO]: handlebar, post messages, hack other people
-// auto-refresh, switch room
+// [TODO]: handlebar, hack other people
+// sync, switch room
 
 // $(document).ready(function(){
+  var ChatSettings = {
+    username: /username=(.*)/g.exec(window.location.search)[1],
+    roomname: 'lobby'
+  };
 
   // =============== MODEL ==================
   var Message = Backbone.Model.extend({
@@ -40,7 +44,7 @@
   var Room = Backbone.Collection.extend({
     model: Message,
     url: function() {
-      return 'https://api.parse.com/1/classes/chatterbox?where={"roomname":"'+this.roomname+'"}&order=-createdAt';
+      return 'https://api.parse.com/1/classes/chatterbox?where={"roomname":"'+this.roomname+'"}&order=-createdAt&limit=30';
     },
     initialize: function(models, options) {
       this.roomname = options.roomname;
@@ -112,7 +116,22 @@
 
 // =============== Posting ==================
 
+var sendMsg = function() {
+  var msg = new Message();
+  msg.set('username', ChatSettings.username);
+  var text = $("#msgToSend").val();
+  msg.set('text', text);
+  msg.set('roomname', ChatSettings.roomname)
+  msg.save();
+  $("#msgToSend").val('');
+};
 
+$("#sendMsgBtn").click(sendMsg);
+$("#msgToSend").keydown(function (e) {
+  if (e.keyCode == 13) {
+    sendMsg();
+  }
+});
 
 // });
 
