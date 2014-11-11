@@ -97,3 +97,9 @@ form input[type=text] {
 .user-inputs{
     padding-bottom: 10px;
 }
+
+.bye {
+    float: right;
+    height: 46px;
+    margin-bottom: 5px;
+}

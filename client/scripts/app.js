@@ -116,23 +116,38 @@
 
 // =============== Posting ==================
 
-var sendMsg = function() {
-  var msg = new Message();
-  msg.set('username', ChatSettings.username);
-  var text = $("#msgToSend").val();
-  msg.set('text', text);
-  msg.set('roomname', ChatSettings.roomname)
-  msg.save();
-  $("#msgToSend").val('');
-};
+  var sendMsg = function() {
+    var msg = new Message();
+    msg.set('username', ChatSettings.username);
+    var text = $("#msgToSend").val();
+    msg.set('text', text);
+    msg.set('roomname', ChatSettings.roomname)
+    msg.save();
+    $("#msgToSend").val('');
+  };
 
-$("#sendMsgBtn").click(sendMsg);
-$("#msgToSend").keydown(function (e) {
-  if (e.keyCode == 13) {
-    sendMsg();
-  }
-});
+  $("#sendMsgBtn").click(sendMsg);
+  $("#msgToSend").keydown(function (e) {
+    if (e.keyCode == 13) {
+      sendMsg();
+    }
+  });
 
+  var bye = function(id) {
+    $.ajax({
+    // always use this url
+    url: 'https://api.parse.com/1/classes/chatterbox/'+id,
+    type: 'DELETE',
+    contentType: 'application/json',
+    success: function (data) {
+      console.log('data received:', data);
+    },
+    error: function (data) {
+      // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+      console.error('chatterbox: Failed to send message');
+    }
+    });
+  };
 // });
 
 

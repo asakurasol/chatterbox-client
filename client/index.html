@@ -16,7 +16,7 @@
   </head>
   <body>
     <script type='text/template' id='messageViewTemplate'>
-      <span><%= username %></span><span class="msg-text"><%= text %></span><span class="msg-timestamp"><%= msgtime %></span>
+      <span><%= username %></span><span class="msg-text"><%= text %></span><div class="bye"><a id="bye" href="#" onclick='bye("<%= objectId %>")'>bye</a></div><span class="msg-timestamp"><%= msgtime %></span>
     </script>
     <div id="main">
       <h1 class="ui header">chatterbox</h1>
@@ -27,6 +27,7 @@
           <i class="users icon"></i>
         </div>
         <button id="sendMsgBtn" class="ui button">Send</button>
+
       </div>
 
       <div id="main-msg"></div>
