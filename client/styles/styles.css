@@ -83,6 +83,12 @@ form input[type=text] {
     padding: 10px;
 }
 
+.roomname {
+    padding-left: 10px ;
+    font-style: italic;
+    color: sandybrown;
+}
+
 .msg-text{
     padding-left: 20px ;
     color: lightslategray;

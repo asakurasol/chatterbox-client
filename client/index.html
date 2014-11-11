@@ -15,11 +15,26 @@
     <script src="bower_components/moment/min/moment.min.js"></script>
   </head>
   <body>
-    <script type='text/template' id='messageViewTemplate'>
-      <span><%= username %></span><span class="msg-text"><%= text %></span><div class="bye"><a id="bye" href="#" onclick='bye("<%= objectId %>")'>bye</a></div><span class="msg-timestamp"><%= msgtime %></span>
+    <div id='userFilterContainer'>
+
+    <script type="text/template" id='userFilterTemplate'>
+      <%=username%>
+      <i class="delete icon"></i>
     </script>
+
+    <script type='text/template' id='messageViewTemplate'>
+      <span class="username"><%= username %></span>
+      <span class="roomname"><%= '-'+roomname+'-' %></span>
+      <span class="msg-text"><%= text %></span>
+      <div class="bye">
+        <a id="bye" href="#" onclick='bye("<%= objectId %>")'>bye</a>
+      </div>
+      <span class="msg-timestamp"><%= msgtime %></span>
+    </script>
+
     <div id="main">
-      <h1 class="ui header">chatterbox</h1>
+      <h1 id="roomname" class="ui header">chatterbox</h1>
+      <div id="userFiltersContainer"></div>
       <!-- Your HTML goes here! -->
       <div class="user-inputs">
         <div class="ui left icon input">
