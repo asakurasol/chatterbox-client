@@ -15,16 +15,21 @@
     <script src="bower_components/moment/min/moment.min.js"></script>
   </head>
   <body>
+    <script type='text/template' id='messageViewTemplate'>
+      <span><%= username %></span><span class="msg-text"><%= text %></span><span class="msg-timestamp"><%= msgtime %></span>
+    </script>
     <div id="main">
       <h1 class="ui header">chatterbox</h1>
       <!-- Your HTML goes here! -->
-        <script type='text/template' id='messageViewTemplate'>
-          <span><%= username %></span><span class="msg-text"><%= text %></span><span class="msg-timestamp"><%= msgtime %></span>
-        </script>
-
-
-
+      <div class="ui left icon input">
+        <input type="text" placeholder="What are you thinking right now">
+        <i class="users icon"></i>
+        <button class="ui button">
+          Send
+        </button>
       </div>
+
+      <div id="main-msg"></div>
     </div>
   </body>
   <!-- your scripts -->

@@ -1,16 +1,18 @@
+// [TODO]: handlebar, post messages, hack other people
+// auto-refresh, switch room
+
 // $(document).ready(function(){
 
   // =============== MODEL ==================
   var Message = Backbone.Model.extend({
     initialize: function() {
       var that = this;
-      // this.fetch({success:function() {
-      //   }
-      // });
 
-    var mt = moment( that.get('createdAt') ).format('HH:mm MM/DD/YYYY')
-    that.set('msgtime', mt );
+      var mt = moment( that.get('createdAt') ).format('HH:mm MM/DD/YYYY')
+      that.set('msgtime', mt );
 
+      this.set('username', this.escape('username'));
+      this.set('text', this.escape('text'));
     },
     defaults: {
       'username': 'Ghost',
@@ -18,9 +20,9 @@
       'roomname': 'lobby',
       'msgtime': ''
     },
-    // url: function() {
-    //   return 'https://api.parse.com/1/classes/chatterbox/SFTwY4sW5G';
-    // }
+    url: function() {
+      return 'https://api.parse.com/1/classes/chatterbox';
+    }
 
 
 
@@ -38,7 +40,7 @@
   var Room = Backbone.Collection.extend({
     model: Message,
     url: function() {
-      return 'https://api.parse.com/1/classes/chatterbox?where={"roomname":"'+this.roomname+'"}';
+      return 'https://api.parse.com/1/classes/chatterbox?where={"roomname":"'+this.roomname+'"}&order=-createdAt';
     },
     initialize: function(models, options) {
       this.roomname = options.roomname;
@@ -75,13 +77,13 @@
     },
     render: function() {
       var that = this;
-
       this._messageViews = [];
       this.collection.each(function(msg) {
         that._messageViews.push(new MessageView({
           model: msg
         }));
       });
+
       $(this.el).empty(); // reset view
 
       _(this._messageViews).each(function(mv){ // mv: message view
@@ -91,8 +93,24 @@
 
   });
 
+  var room = new Room([], {roomname:'lobby'});
+  var rv = new RoomView( {collection: room } );
+  var renderAll = function() {
+    room.fetch({
+      reset: true,
+      success: function() {
+        rv.render();
+        $('#main-msg').empty();
+        $('#main-msg').append(rv.el);
+      }
+    });
+  };
 
-  var rv = new RoomView( {collection: new Room([],{roomname:'lobby'}) } );
+  renderAll();
+  window.setInterval(renderAll, 5000);
+
+
+// =============== Posting ==================
 
 
 
