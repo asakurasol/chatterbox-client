@@ -13,6 +13,7 @@
     <script src="bower_components/semantic-ui/build/packaged/javascript/semantic.min.js"></script>
     <script src="bower_components/handlebars/handlebars.min.js"></script>
     <script src="bower_components/moment/min/moment.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   </head>
   <body>
     <div id='userFilterContainer'>
@@ -23,9 +24,9 @@
     </script>
 
     <script type='text/template' id='messageViewTemplate'>
-      <span class="username"><%= username %></span>
-      <span class="roomname"><%= '-'+roomname+'-' %></span>
-      <span class="msg-text"><%= text %></span>
+      <span class="username"><%- username %></span>
+      <span class="roomname"><%- '-'+roomname+'-' %></span>
+      <span class="msg-text"><%- text %></span>
       <div class="bye">
         <a id="bye" href="#" onclick='bye("<%= objectId %>")'>bye</a>
       </div>
@@ -39,7 +40,7 @@
       <div class="user-inputs">
         <div class="ui left icon input">
           <input id="msgToSend" type="text" placeholder="What are you thinking right now" size="50">
-          <i class="users icon"></i>
+          <i class="comment icon"></i>
         </div>
         <button id="sendMsgBtn" class="ui button">Send</button>
 
@@ -51,4 +52,5 @@
   <!-- your scripts -->
   <script src="env/config.js"></script>
   <script src="scripts/app.js"></script>
+  <script src="scripts/init.js"></script>
 </html>

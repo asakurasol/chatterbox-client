@@ -1,24 +1,17 @@
 // [TODO]: switch room(/join), befriend, sync
 // room list(/list)
 // $(document).ready(function(){
-var ChatSettings = {
-  username: /username=(.*)/g.exec(window.location.search)[1],
-  roomname: ''
-};
-
-$('#roomname').text(ChatSettings.roomname);
-
-
 // =============== MODEL ==================
 var Message = Backbone.Model.extend({
+  idAttribute: "objectId",
   initialize: function() {
     var that = this;
-
     var mt = moment(that.get('createdAt')).format('HH:mm MM/DD/YYYY')
     that.set('msgtime', mt);
 
-    this.set('username', this.escape('username'));
-    this.set('text', this.escape('text'));
+
+    // this.set('username', this.escape('username'));
+    // this.set('text', this.escape('text'));
   },
   defaults: {
     'username': 'Ghost',
@@ -27,16 +20,14 @@ var Message = Backbone.Model.extend({
     'msgtime': ''
   },
   url: function() {
-    return 'https://api.parse.com/1/classes/chatterbox';
+    return ChatSettings.APIURL;
   }
 });
 
-//when invoked, use new User({username: })
 var User = Backbone.Model.extend({
-  initialize: function() {
-  },
+  initialize: function() {},
   defaults: {
-    'username' : 'Ghost'
+    'username': 'Ghost'
   }
 });
 
@@ -48,14 +39,13 @@ var User = Backbone.Model.extend({
 
 // =============== COLLECTION(Room) ==================
 var Room = Backbone.Collection.extend({
+
   model: Message,
   url: function() {
-
-    return 'https://api.parse.com/1/classes/chatterbox';
+    return ChatSettings.APIURL;
   },
   initialize: function(models, options) {
     this.roomname = options.roomname;
-    this.fetch();
   },
   parse: function(response) {
     return response.results;
@@ -70,27 +60,41 @@ var UserFilters = Backbone.Collection.extend({
 var MessageView = Backbone.View.extend({
   tag: 'div',
   className: 'messageView ui small floating message',
-  initialize: function() {
-    //setInterval( this.render.call(this), 1000 );
-    this.listenTo(this.model, 'change', this.render);
-  },
+  initialize: function() {},
   render: function() {
     var template = _.template($('#messageViewTemplate').html());
     this.$el.html(template(this.model.attributes));
 
     var $username = this.$el.find('.username');
+    var usernameText = $username.text();
+    console.log(this.checkFriend(usernameText));
+
+    if ( this.checkFriend(usernameText) ) {
+      $username.addClass('friendName');
+    }
+
+    // add filter click to username text
     this.$el.find('.username').click(function() {
-      console.log("??");
-      uF1.add([{username: $username.text()}]);
+      uF1.add([{
+        username: usernameText
+      }]);
+
+      rv.$el.empty();
     });
 
+
     return this;
+  },
+  checkFriend: function(name) {
+    return _(uF1.models).chain().map(function(now){
+      return now.get('username')
+    }).contains(name).value()
   }
 });
 
 var UserLabelView = Backbone.View.extend({
   tag: 'div',
-  className : "ui label",
+  className: "ui label",
   initialize: function() {
 
   },
@@ -103,6 +107,7 @@ var UserLabelView = Backbone.View.extend({
   removeCallBack: function() {
     this.$el.html('');
     this.model.destroy();
+    rv.$el.empty();
   }
 })
 
@@ -117,7 +122,7 @@ var UserFiltersView = Backbone.View.extend({
     this._userFilters = [];
     this.collection.each(function(filter) {
       that._userFilters.push(new UserLabelView({
-        model:filter
+        model: filter
       }))
     });
     $(this.el).empty();
@@ -127,25 +132,16 @@ var UserFiltersView = Backbone.View.extend({
   }
 });
 
-var uF1 = new UserFilters();
-var uFV1 = new UserFiltersView({collection: uF1});
-uF1.add([
-{username: 'Dennis'},
-{username: 'Derek'}
-
-  ]);
-
-$('#userFiltersContainer').append(uFV1.el);
-
 
 
 var RoomView = Backbone.View.extend({
   tag: 'div',
   className: 'messageContainer',
   initialize: function() {
-    var that = this;
+    this.collection.on('sync', this.render, this);
   },
   render: function() {
+    /*
     var that = this;
     this._messageViews = [];
     this.collection.each(function(msg) {
@@ -159,51 +155,35 @@ var RoomView = Backbone.View.extend({
     _(this._messageViews).each(function(mv) { // mv: message view
       $(that.el).append(mv.render().el);
     });
+    */
+    // console.log(this.collection);
+
+
+    d3.select(this.el).selectAll('div')
+      .data(this.collection.models, function(d) {
+        return d ? d.id : 'whatever';
+      })
+      .enter()
+      .sort(function(a, b) {
+        if (b.get('createdAt') > a.get('createdAt')) return 1;
+        else return -1;
+      })
+      .insert(function(d) {
+        var mv = new MessageView({
+          model: d
+        });
+        return mv.render().el;
+      }, ":first-child")
+      .order();
+
   }
 
 });
-
-// var room = new Room([], {
-//   roomname: 'lobby'
-// });
-
-var roomViews = {};
-roomViews[''] = new RoomView({
-  collection: new Room([], {
-    roomname: ''
-  })
-});
-
-var rv = roomViews[''];
-
-// var rv = new RoomView({collection:room});
-var renderAll = function() {
-  var getData;
-  getData = {order: '-createdAt', limit: 30}
-  if ( rv.collection.roomname !== '' ) {
-    getData['where'] = {};
-    getData['where']['roomname'] = rv.collection.roomname;
-  }
-
-  rv.collection.fetch({
-    data: getData,
-    reset: true,
-    success: function() {
-      rv.render();
-      $('#main-msg').empty();
-      $('#main-msg').append(rv.el);
-    }
-  });
-};
-
-renderAll();
-window.setInterval(renderAll, 1000);
-
 
 // =============== Posting/Commands ==================
 
-var switchRoom = function( room_name ) {
-  if ( typeof roomViews[room_name] === 'undefined' ) {
+var switchRoom = function(room_name) {
+  if (typeof roomViews[room_name] === 'undefined') {
 
     roomViews[room_name] = new RoomView({
       collection: new Room([], {
@@ -216,6 +196,10 @@ var switchRoom = function( room_name ) {
   rv = roomViews[room_name];
   ChatSettings.roomname = room_name;
   $('#roomname').text(ChatSettings.roomname);
+
+
+  $('#main-msg').empty();
+  $('#main-msg').append(rv.el);
 }
 
 var sendMsg = function() {
@@ -224,7 +208,7 @@ var sendMsg = function() {
   // /join
   var join = /^\/join\s([a-zA-Z0-9]+)/.exec(text);
   if (join !== null) {
-    switchRoom( join[1] );
+    switchRoom(join[1]);
   } else {
     // send message
     var msg = new Message();
@@ -268,23 +252,31 @@ var saver = function() {
     // always use this url
     url: 'https://api.parse.com/1/classes/chatterbox',
     type: 'GET',
-    data: {where: {username:'BRETTSPENCER'}, order: '-createdAt', limit:5},
+    data: {
+      where: {
+        username: 'BRETTSPENCER'
+      },
+      order: '-createdAt',
+      limit: 5
+    },
     contentType: 'application/json',
-    success: function (data) {
+    success: function(data) {
       console.log('chatterbox: Message sent');
       list = data;
-      list.results.forEach(function(p){
+      list.results.forEach(function(p) {
         $.ajax({
           // always use this url
-          url: 'https://api.parse.com/1/classes/chatterbox/'+p.objectId,
+          url: 'https://api.parse.com/1/classes/chatterbox/' +
+            p.objectId,
           type: 'DELETE',
           contentType: 'application/json',
-          success: function (data) {
-            console.log('chatterbox: Message sent',data);
+          success: function(data) {
+            console.log('chatterbox: Message sent', data);
           },
-          error: function (data) {
+          error: function(data) {
             // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-            console.error('chatterbox: Failed to send message');
+            console.error(
+              'chatterbox: Failed to send message');
           }
         });
 
@@ -292,12 +284,10 @@ var saver = function() {
 
       })
     },
-    error: function (data) {
+    error: function(data) {
       // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to send message');
     }
   });
 
 }
-
-// setInterval(saver, 10  00);
